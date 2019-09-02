@@ -1,0 +1,127 @@
+---
+title: "Assignment1"
+author: "Abdelmalek Hajjam"
+date: "September 1, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Assignment1
+
+### loading data and print few lines from the beginning
+```{r }
+#load our mushrooms dataset into a data table
+data_mushrooms <- read.table("agaricus-lepiota.data", header = TRUE, sep = ",")
+
+#what dimension is our dataset
+dim(data_mushrooms)
+
+#describe our dataset
+str(data_mushrooms)
+
+names(data_mushrooms)
+
+#read the first few lines of data
+head(data_mushrooms)
+```
+
+### Let's do some counting
+
+```{r }
+#let's count the numbers of rows
+nrow(data_mushrooms)
+
+#looking for missing values
+NROW(na.omit(data_mushrooms))
+
+```
+
+###   ******  All Rows have data.******
+
+
+### renaming the columns
+```{r }
+my_new_mushrooms <- cbind(data_mushrooms[,1:4], data_mushrooms[,6])
+head(my_new_mushrooms)
+#reading the names
+names(my_new_mushrooms)
+```
+
+### Renaming columns
+```{r }
+#let's rename all those column names
+colnames(my_new_mushrooms) <- c("edibleORpoisonous","shape","surface","color","odor")
+
+#let's read few rows of our subset now
+head(my_new_mushrooms)
+```
+
+### Let's change some values
+```{r }
+#Let's change the values of edibleORpoisonous to some thing readable
+levels(my_new_mushrooms$edibleORpoisonous)[levels(my_new_mushrooms$edibleORpoisonous)=='p'] <- 'poisonous'
+levels(my_new_mushrooms$edibleORpoisonous)[levels(my_new_mushrooms$edibleORpoisonous)=='e'] <- 'edible'
+
+#Let's read now
+head(my_new_mushrooms)
+
+#Let's rename the values of the shape variable:
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='b'] <- 'bell'
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='c'] <- 'conical'
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='x'] <- 'convex'
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='f'] <- 'flat'
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='k'] <- 'knobbed'
+levels(my_new_mushrooms$shape)[levels(my_new_mushrooms$shape)=='s'] <- 'sunken'
+
+head(my_new_mushrooms)
+str(my_new_mushrooms)
+```
+
+### Let's rename the rest
+```{r}
+#Renaming surface
+levels(my_new_mushrooms$surface)[levels(my_new_mushrooms$surface)=='f'] <- 'fibrous'
+levels(my_new_mushrooms$surface)[levels(my_new_mushrooms$surface)=='g'] <- 'grooves'
+levels(my_new_mushrooms$surface)[levels(my_new_mushrooms$surface)=='y'] <- 'scaly'
+levels(my_new_mushrooms$surface)[levels(my_new_mushrooms$surface)=='s'] <- 'smooth'
+
+#Renaming color
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='n'] <- 'brown'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='b'] <- 'buff'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='c'] <- 'cinnamon'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='g'] <- 'gray'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='r'] <- 'green'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='p'] <- 'pink'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='u'] <- 'purple'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='e'] <- 'red'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='w'] <- 'white'
+levels(my_new_mushrooms$color)[levels(my_new_mushrooms$color)=='y'] <- 'yellow'
+
+#Renaming odor
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='a'] <- 'almond'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='l'] <- 'anise'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='c'] <- 'creosote'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='y'] <- 'fishy'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='f'] <- 'foul'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='m'] <- 'musty'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='n'] <- 'none'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='p'] <- 'pungent'
+levels(my_new_mushrooms$odor)[levels(my_new_mushrooms$odor)=='s'] <- 'spicy'
+
+#let's read now
+head(my_new_mushrooms)
+
+```
+
+### Let's do the plotting
+
+```{r }
+
+#shape
+plot(my_new_mushrooms$shape)
+```
+
+
