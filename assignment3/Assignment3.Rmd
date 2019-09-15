@@ -1,0 +1,159 @@
+---
+title: "Assignment 3"
+author: "Abdelmalek Hajjam"
+date: "9/14/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of Automated Data Collection in R.  Problem 9 is extra credit.  You may work in a small group, but please submit separately with names of all group participants in your submission.
+
+Here is the referenced code for the introductory example in #3:
+
+
+```{r}
+library(stringr)
+library(XML)
+```
+
+## 3
+```{r}
+raw.data <- "555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5543642Dr. Julius Hibbert"
+
+```
+
+**3.1 Use the tools of this chapter to rearrange the vector so that all elements conform to the standard first_name last_name**
+
+```{r}
+name <- unlist(str_extract_all(raw.data, "[[A-z]., ]{2,}"))
+name
+
+#we can also use:
+#name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+#name
+```
+
+```{r}
+#what's the first name
+firstName <- unlist(str_extract_all(name, "[.,] [[A-z]]{2,}$|[[A-z]]{2,} "))
+firstName <- unlist(str_extract_all(firstName, "[[A-z]]{2,}"))
+firstName
+
+#what's the last name
+lastName <- unlist(str_extract_all(name, "[^[.,]] [[A-z]]{2,}$|[[A-z]]{2,}, "))
+lastName <- unlist(str_extract_all(lastName, "[[A-z]]{2,}"))
+lastName
+
+#construct the data frame by combining the  fistname and lastname columns
+data.frame("Fist Name" = firstName, "Last Name" = lastName)
+
+```
+
+
+**3.2 Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.)**
+```{r}
+myTitles <- unlist(str_extract_all(name, "[[A-z]]{2,}\\."))
+myTitles
+```
+
+```{r}
+data.frame("Name" = name, "hasTitle" = str_detect(name, myTitles))
+
+```
+
+
+**3.3 Construct a logical vector indicating whether a character has a second name**
+```{r}
+secondName <- unlist(str_extract_all(name, " [[A-z]]{1}\\.? [[A-z]]{1,}\\.?"))
+secondName <- unlist(str_extract_all(secondName,"[[A-z]]{1}\\.? [[A-z]]{1,}\\.?"))
+secondName
+
+```
+
+```{r}
+data.frame("Name" = name, "hasSecondName" = str_detect(name, secondName))
+
+```
+
+## 4
+**Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression**
+
+**4.1**
+```{r}
+# [0-9]+\\$ : one or more digits followed by a $ sign.
+pattern1 <- "[0-9]+\\$"
+mydata1 <- c("246$", "97$", "4567$", "0$$")
+str_detect(mydata1, pattern1)
+
+```
+
+**4.2**
+```{r}
+# \\b[a-z]{1,4}\\b : one or more, up to 4 lower case letters from a to z. \b is for word edge and helps in specifying the location of the match.
+pattern2 <- "\\b[a-z]{1,4}\\b"
+mydata2 <- c("data", "is", "not", "far", "from", "here")
+str_detect(mydata2, pattern2)
+
+```
+
+**4.3**
+```{r}
+# .*?\\.txt$ : finds patterns that end with .txt 
+pattern3 <- ".*?\\.txt$"
+mydata3 <- c("data.txt", "file123.txt", "hellow.1.abc.234.txt", "000ZORO!999.txt")
+str_detect(mydata3, pattern3)
+
+```
+
+**4.4**
+```{r}
+# \\d{2}/\\d{2}/\\d{4} : contains date with format mm/dd/yyyy (like in U.S.) or dd/mm/yyyy (like in Europe)
+pattern4 <- "\\d{2}/\\d{2}/\\d{4}"
+mydata4 <- c("09/14/2019", "14/09/2019", "my kid was born in 03/10/2006")
+str_detect(mydata4, pattern4)
+
+```
+
+**4.5**
+```{r}
+# <(.+?)>.+?</\\1> : finds tags in an html document
+pattern5 <- "<(.+?)>.+?</\\1>"
+mydata5 <- c("<div><h1>Data 607</h1><p>This class Data607 is awesome. Learning new things every week.</p></div>", "<html><body>Hello</body></html>", "CUNY is <bold>Cool</bold>.")
+str_detect(mydata5, pattern5)
+
+```
+
+
+## 9
+**Crack the secret Message**
+```{r}
+message <- "clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigOd6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+
+message
+```
+
+```{r}
+#let's remove the lower case letters from the message
+messageWithoutLowerCases <- unlist(str_extract_all(message, "[[:upper:].!]"))
+
+messageWithoutLowerCases
+```
+
+```{r}
+#Put those characters together
+together = paste(messageWithoutLowerCases, collapse="")
+
+together
+```
+
+```{r}
+#then replace the . with space everywhere
+theSecret <- c( str_replace_all(together, "[\\.]",  "  "))
+
+theSecret
+```
+
+
