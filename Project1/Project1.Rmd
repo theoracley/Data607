@@ -1,0 +1,160 @@
+---
+title: "Project 1"
+author: "Abdelmalek Hajjam"
+date: "9/20/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+----------------------------------------------------------------------------
+In this project, you’re given a text file with chess tournament results where the information has some structure. Your
+job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database)
+with the following information for all of the players:
+Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents
+For the first player, the information would be:
+Gary Hua, ON, 6.0, 1794, 1605
+1605 was calculated by using the pre-tournament opponents’ ratings of 1436, 1563, 1600, 1610, 1649, 1663, 1716, and
+dividing by the total number of games played.
+
+The chess rating system (invented by a Minnesota statistician named Arpad Elo) has been used in many other contexts,
+including assessing relative strength of employment candidates by human resource departments.
+-----------------------------------------------------------------------------
+
+
+
+**Loading the data from the tournament file**
+
+```{r}
+
+library(stringr)
+
+chess_dataset <- readLines("./tournamentinfo.txt")
+head(chess_dataset)
+#-------------------------------
+tail(chess_dataset)
+```
+
+**Lets start cleaning our data by removing headers**  
+
+```{r message=FALSE, warning=FALSE}
+chess_dataset_cleaned <- chess_dataset[-c(0:4)]
+head(chess_dataset_cleaned, 15)
+```
+
+**then trim the characters**
+
+```{r}
+chess_dataset_cleaned <- chess_dataset_cleaned[sapply(chess_dataset_cleaned, nchar) > 0]
+head(chess_dataset_cleaned)
+```
+
+
+**then extract the rows (starting from 1) that have names in them into a vector. We use seq() which return those rows numbers. We skip by 3 each time.**
+```{r}
+ourSeq_rows <- c(seq(1, length(chess_dataset_cleaned), 3))
+ourSeq_rows
+```
+
+**get the data corresponding to those rows**
+
+```{r}
+ourSeq_data <- chess_dataset_cleaned[ourSeq_rows]
+head(ourSeq_data)
+```
+
+
+**Let's extract the names using regular expression**
+
+```{r}
+names <- str_extract(ourSeq_data, "[[:alpha:]]{2,}([[:blank:]][[:alpha:]]{1,}){1,}")
+head(names)
+```
+
+**Let's extract the rows numbers into a vector starting from row 2 and skipping 3**
+
+```{r}
+ourseq2 <- c(seq(2, length(chess_dataset_cleaned), 3))
+ourseq2
+```
+
+**get the data corresponding to those rows**
+
+```{r}
+ourSeq2_data <- chess_dataset_cleaned[ourseq2]
+head(ourSeq2_data)
+```
+
+
+**Let's extract the states**
+
+```{r}
+states <- str_extract(ourSeq2_data, "[[:alpha:]]{2}")
+states
+```
+
+**Let's extract the points from ourSeq_data**
+
+```{r}
+thepoints <- str_extract(ourSeq_data, "[[:digit:]]+\\.[[:digit:]]")
+thepoints <- as.numeric(as.character(thepoints))
+thepoints
+```
+
+**Let's extract the pre-rating from ourSeq2_data** 
+
+```{r}
+pre_ratings <- str_extract(ourSeq2_data, ".\\: \\s?[[:digit:]]{3,4}")
+pre_ratings
+```
+
+**Let's extract the digits and convert them to numeric**
+
+```{r}
+pre_ratings <- as.numeric(str_extract(pre_ratings, "\\(?[0-9,.]+\\)?"))
+pre_ratings
+
+```
+
+**Let's do the same for the opponent** 
+
+```{r message=FALSE, warning=FALSE}
+opponent_numbers <- str_extract_all(ourSeq_data, "[[:digit:]]{1,2}\\|")
+opponent_numbers <- str_extract_all(opponent_numbers, "[[:digit:]]{1,2}")
+opponent_numbers <- lapply(opponent_numbers, as.numeric)
+head(opponent_numbers)
+```
+
+**What's the prerating average for our opponent?**
+
+```{r}
+opponent_prerating_average <- list()
+
+for (i in 1:length(opponent_numbers)){
+  opponent_prerating_average[i] <- round(mean(pre_ratings[unlist(opponent_numbers[i])]),2)
+}
+opponent_prerating_average <- lapply(opponent_prerating_average, as.numeric)
+opponent_prerating_average <- data.frame(unlist(opponent_prerating_average))
+
+ourFinalTable <- cbind.data.frame(names, states, thepoints, pre_ratings, opponent_prerating_average)
+colnames(ourFinalTable) <- c("Player_Name", "Player_State", "Player_Points", "Player_Pre_Rating", "Opponent_Pre_Rating_AVG")
+ourFinalTable
+```
+
+**Write this result table to an output file**
+
+```{r}
+write.csv(ourFinalTable, "./Results.csv")
+```
+
+**Let's Plot**
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+
+ggplot(ourFinalTable, aes(x=Player_Pre_Rating)) + geom_histogram(binwidth = 50)
+
+ggplot(ourFinalTable, aes(x=Opponent_Pre_Rating_AVG)) + geom_histogram(binwidth = 50)
+
+ggplot(data = ourFinalTable, aes(x = Player_Pre_Rating, y = Opponent_Pre_Rating_AVG)) + geom_point(color='red') + geom_smooth(method = "lm", se = FALSE)
+```
