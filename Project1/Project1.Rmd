@@ -5,6 +5,7 @@ date: "9/20/2019"
 output:
   pdf_document: default
   html_document: default
+  word_document: default
 ---
 
 ----------------------------------------------------------------------------
@@ -25,13 +26,16 @@ including assessing relative strength of employment candidates by human resource
 
 **Loading the data from the tournament file**
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
 library(stringr)
 
-chess_dataset <- readLines("./tournamentinfo.txt")
+chess_dataset <- readLines('https://raw.githubusercontent.com/theoracley/Data607/master/Project1/tournamentinfo.txt')
+#chess_dataset <- readLines('https://github.com/theoracley/Data607/blob/master/Project1/tournamentinfo.txt')
+#chess_dataset <- readLines("./tournamentinfo.txt")
+
 head(chess_dataset)
-#-------------------------------
+
 tail(chess_dataset)
 ```
 
@@ -127,7 +131,7 @@ head(opponent_numbers)
 
 **What's the prerating average for our opponent?**
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 opponent_prerating_average <- list()
 
 for (i in 1:length(opponent_numbers)){
@@ -156,5 +160,4 @@ ggplot(ourFinalTable, aes(x=Player_Pre_Rating)) + geom_histogram(binwidth = 50)
 
 ggplot(ourFinalTable, aes(x=Opponent_Pre_Rating_AVG)) + geom_histogram(binwidth = 50)
 
-ggplot(data = ourFinalTable, aes(x = Player_Pre_Rating, y = Opponent_Pre_Rating_AVG)) + geom_point(color='red') + geom_smooth(method = "lm", se = FALSE)
 ```
