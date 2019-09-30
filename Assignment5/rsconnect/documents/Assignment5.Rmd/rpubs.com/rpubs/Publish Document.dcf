@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/533771/7d65f15bf39d40b2a9e64b176988e8b8
+bundleId: https://api.rpubs.com/api/v1/document/533771/7d65f15bf39d40b2a9e64b176988e8b8
+url: http://rpubs.com/ahajjam/533771
+when: 1569803899.54412

@@ -35,7 +35,10 @@ library("Hmisc")
 library("ggplot2")
 
 #Read from csv file
-airlinesData_csv <- read.csv("TwoAirlines.csv", header=TRUE, sep=",")
+
+airlinesData_csv <- read.csv("https://raw.githubusercontent.com/theoracley/Data607/master/Assignment5/TwoAirlines.csv", header=TRUE, sep=",")
+
+#airlinesData_csv <- read.csv("TwoAirlines.csv", header=TRUE, sep=",")
 #airlinesData_csv
 
 #Find the datatype of AirlinesData_df first
@@ -45,6 +48,7 @@ typeof(airlinesData_csv)
 AirlinesData_df <- data.frame(airlinesData_csv)
 
 ```
+
 
 ### let's go to work
 
@@ -84,6 +88,7 @@ describe(AirlinesData_df)
 
 ```
 
+
 **Store our cleaned data into a csv file**
 
 ```{r message=FALSE, warning=FALSE}
@@ -93,6 +98,7 @@ write.csv(AirlinesData_df, "./cleanAirlines.csv", row.names=FALSE)
 tempAirlines <- AirlinesData_df
 tempAirlines
 ```
+
 
 
 **Analyze this!!**
@@ -123,6 +129,8 @@ ggplot(data=airLines_analysis1, aes(x=airline, y=percent_delayed)) +
   xlab("Airlines") + ylab("Delays") +
   ggtitle("Delays")
 ```
+
+
 **we observe that AM West has more delays and less on time flights than ALASKA.**
 
 
@@ -139,7 +147,9 @@ ggplot(data=airLines_analysis1, aes(x = airline, y=percent_delayed, fill = city)
           xlab("Airlines") + ylab("Delays") + ggtitle("On Time per Airport")
 
 ```
-**When it comes to major airports, there are more delays there. Might be in these major airports, AM WEST conducts more flights than in ALASKA.let's check our assumption graphically, shall we?**
+
+
+**When it comes to major airports, there are more delays there. Might be in these major airports, AM WEST conducts more flights than in ALASKA. Let's check our assumption graphically, shall we?**
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -154,6 +164,7 @@ ggplot(data=airLines_analysis2, aes(x = airline, y=num, fill = city)) +
 
 
 ```
+
 **We can see clearly that AM West is running few flights in the major airport, but has more delays than ALASKA. So our previous assumption was totally wrong.**
 
 
