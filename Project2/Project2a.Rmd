@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+---------------------------------------------------------------------------------------------------------
 The goal of this assignment is to give you practice in preparing different datasets for downstream
 analysis work.
 Your task is to:
@@ -27,12 +28,14 @@ narrative descriptions of your data cleanup work, analysis, and conclusions.
 (2) Please include in your homework submission, for each of the three chosen datasets:
  The URL to the .Rmd file in your GitHub repository, and
  The URL for your rpubs.com web page.
+--------------------------------------------------------------------------------------------------------
+
+### DATASET: POPULATION vs MARRIAGE
+**Found here: https://raw.githubusercontent.com/theoracley/Data607/master/Project2/national_marriage_divorce_rates.csv**
+ 
+#### In this dataset, we will see what's the relationship between Marriage and Poplation rate between 2000 and 2016, as we analyse their growth. We will also see what drives this growth in these specific years.
 
 
-
-
-###DATASET: POPULATION vs MARRIAGE
-####Found here: https://rawgit.com/nschettini/CUNY-MSDS-DATA-607/master/national_marriage_divorce_rates_00-16.csv
 
 ```{r message=FALSE, warning=FALSE}
 #Load all required packages
@@ -47,7 +50,7 @@ library(tidyverse)
 ```{r message=FALSE, warning=FALSE}
 
 #Reading our data from csv file
-data <- read.csv(file="national_marriage_divorce_rates.csv", header=FALSE, sep=",")
+data <- read.csv("https://raw.githubusercontent.com/theoracley/Data607/master/Project2/national_marriage_divorce_rates.csv", header=FALSE, sep=",")
 
 #using tibble, convert and check out the data
 as.tibble(data)
@@ -83,10 +86,10 @@ clean_data
 
 **Let's plot**
 ```{r message=FALSE, warning=FALSE}
-qplot(data=clean_data, x=years, y=population, size=I(3), color=I("#CC0000"), main="Population vs Years")
-qplot(data=clean_data, x=years, y=population_rate, size=I(3), color=I("Red"), main="Population Rate vs Years")
-qplot(data=clean_data, x=years, y=marriage, size=I(3), color=I("Blue"), main="Marriage vs Years")
+qplot(data=clean_data, x=years, y=population, size=I(3), color=I("#388e3c"), main="Population vs Years")
+qplot(data=clean_data, x=years, y=population_rate, size=I(3), color=I("#4dd0e1"), main="Population Rate vs Years")
+qplot(data=clean_data, x=years, y=marriage, size=I(3), color=I("#ff6d00"), main="Marriage vs Years")
 ```
 
-##Conclusion
+## Conclusion
 **Part of the life, Population is always increasing. From the plats above, we can see that the marriage was declining from 2000 to 2009 ("Marriage vs Years"), then picks up increasinly after 2009. In the same time ("Population Rate vs years"), the population rate was also declining from 2000 to 2009, and then stayed study from 2009 to 2013, then picks up increasinly since then. Therefore there is a strong positive correclation between Population rate and Marriage. In fact, this can be explained easily, as after 9/11, lot of businesses were lost and therfore lot of layoffs, families losing their jobs, which discourage couples from getting married, hence less new borns and the rate of population goes down. Add to that the housing crisis, Enron, banks fraud...etc which leads into a big recession. To bring the economy back on its feet, the government passed lot of new laws and regulations to stop the housing madness. It also added new packages to stimulate the conomy and create jobs.After that happned in 2019, the conomy started to pick up and people start having confidence in the economy. Things become normal again and couples feeling good about the economy, start thinking about making families, leading to an increase in new borns. ** 

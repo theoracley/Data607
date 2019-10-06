@@ -1,0 +1,121 @@
+---
+title: "Project2b"
+author: "Abdelmalek Hajjam"
+date: "10/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2016 US Elections
+### Dataset found at https://www.kaggle.com/benhamner/2016-us-election
+
+
+**Here, we will do an analysis of the analyzed_votes in two states considered to be democratic states. We will see what happened and why these two states were lost in the general election. We will analyse the two most blue wall states michigan and wisconsin. After all the Clintons are from Wisconson.**
+
+
+```{r message=FALSE, warning=FALSE}
+#Load all required packages
+
+#install.packages("RJSONIO")
+#install.packages("mapproj")
+#install.packages('choroplethr')
+#install.packages('choroplethrMaps')
+
+library(tidyr)
+library(dplyr)    
+library(ggplot2) 
+library(data.table)
+library(RJSONIO)
+library(choroplethr)
+library(choroplethrMaps)
+library(mapproj)
+library(stringr)
+
+```
+
+**loading the data**
+```{r}
+our_primary_results=fread('https://raw.githubusercontent.com/theoracley/Data607/master/Project2/primary_results.csv')
+our_primary_results=data.frame(our_primary_results)
+#head(our_primary_results)
+our_demographics=fread('https://raw.githubusercontent.com/theoracley/Data607/master/Project2/county_facts.csv')
+our_demographics=data.frame(our_demographics)
+#head(our_demographics)
+```
+
+**Cleaning the data**
+```{r}
+our_primary_analyzed_votes = our_primary_results %>%  
+            filter(candidate %in% c("Bernie Sanders","Donald Trump")) %>%
+            filter(state_abbreviation %in% c("MI","WI")) 
+our_demographics %<>%
+    filter(state_abbreviation %in% c("MI","WI")) %>% 
+    select(state_abbreviation = state_abbreviation, county = area_name, 
+           income = INC110213, hispanic = RHI725214, female = SEX255214,
+           white= RHI825214, college = EDU685213, density = POP060210) %>% 
+    mutate(county = gsub(" County", "", county))
+analyzed_votes = inner_join(our_primary_analyzed_votes, our_demographics, by = c("state_abbreviation","county"))
+
+```
+
+**Plotting**
+```{r}
+
+# White voters with less education
+ggplot(analyzed_votes) + geom_bar(aes(white , college, fill=candidate), stat="summary", fun.y="mean") + labs(x="White", y="Education", title="White Non-College Voters") + theme(axis.text.x=element_blank())
+
+# White Women in General
+ggplot(analyzed_votes) + geom_bar(aes(white , female, fill=candidate), stat="summary", fun.y="mean") + labs(x="White", y="Women", title="White Women Voters") + theme(axis.text.x=element_blank())
+
+```
+
+**Let's put everything on the Map**
+```{r}
+
+BerniePrimary= analyzed_votes %>%  
+            filter(candidate %in% c("Bernie Sanders"))
+
+BerniePrimary$region=BerniePrimary$fips
+BerniePrimary$value= BerniePrimary$votes
+
+
+TrumpPrimary= analyzed_votes %>%  
+            filter(candidate %in% c("Donald Trump"))
+
+TrumpPrimary$region=TrumpPrimary$fips
+TrumpPrimary$value= TrumpPrimary$votes
+
+# Michigan
+
+mi_choro_bs = county_choropleth(BerniePrimary, state_zoom="michigan", legend = "Raw Votes", num_colors=3) + 
+  ggtitle("Bernie Sanders in Michigan Dem Primary") +
+  coord_map()  
+mi_choro_bs
+
+d_mi_choro_bs = county_choropleth(TrumpPrimary, state_zoom="michigan", legend = "Raw Votes", num_colors=7) + 
+  ggtitle("Donald Trump in Michigan Rep Primary") +
+  coord_map()  
+d_mi_choro_bs
+
+## Wisconsin
+
+wi_choro_bs = county_choropleth(BerniePrimary, state_zoom="wisconsin", legend = "Raw Votes", num_colors=3) + 
+  ggtitle("Bernie Sanders in Wisconsin Dem Primary") +
+  coord_map()  
+wi_choro_bs
+
+d_wi_choro_bs = county_choropleth(TrumpPrimary, state_zoom="wisconsin", legend = "Raw Votes", num_colors=7) + 
+  ggtitle("Donald Trump in Wisconsin Rep Primary") +
+  coord_map()  
+d_wi_choro_bs
+
+
+```
+
+## Conclusion:
+
+**Michigan State and Wisconson are the blue wall states and historically always vote for Democrats, yet Hillary lost the primaries in these two states. We can clearly see from the analysis that white working class voters as well as white women favor Bernie Sanders. Also we can see that the counties where Donald Trum did very well in the republican primaries, are also the counties where bernie Sanders did very well in democratic primaries. My humble logic tells me that if Bernie Sanders were the candidate in the general Election, then these two states will go for democrats. Unfortunatly he lost to Hillary who did not do good in these 2 states. Hence in the general election, for these categories in the analysis, these analyzed_votes will either go to the opponent candidate (Donald Trump), or there is a good chnace that these people will not vote.In either case, Donald Trump will win, and this is exactly what happened. I'm wondering why, in regards of loosing the primaries in these two states, Hillary did not make an attempt to visit those two states and talk to them about their problems. ON the other hand, Trump's team saw an opportunity and took advantage of it.**
+
