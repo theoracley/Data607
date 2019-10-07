@@ -1,0 +1,222 @@
+---
+title: "Project2c"
+author: "Abdelmalek Hajjam"
+date: "10/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Dataset: HEART Disease as per my discussion post
+#### found at: https://www.kaggle.com/ronitf/heart-disease-uci
+
+Columns definition:
+
+1. age
+
+2. sex
+
+3. chest pain type (4 values)
+
+4. resting blood pressure
+
+5. serum cholestoral in mg/dl
+
+6. fasting blood sugar > 120 mg/dl
+
+7. resting electrocardiographic results (values 0,1,2)
+
+8. maximum heart rate achieved
+
+9. exercise induced angina
+
+10. oldpeak = ST depression induced by exercise relative to rest
+
+11. the slope of the peak exercise ST segment
+
+12. number of major vessels (0-3) colored by flourosopy
+
+13. thal: 3 = normal; 6 = fixed defect; 7 = reversable defect
+
+
+```{r message=FALSE, warning=FALSE}
+#Load all required packages
+library(DT)
+library(tidyr)
+library(dplyr)    
+library(ggplot2)
+library(tidyverse)
+```
+
+**Load data and examine columns**
+```{r message=FALSE, warning=FALSE}
+#Reading our data from csv file in github
+heartDS <- read.csv("https://raw.githubusercontent.com/theoracley/Data607/master/Project2/heart.csv", header=TRUE, sep=",")
+
+head(heartDS)
+colnames(heartDS)
+
+#Let's rename those columns
+colnames(heartDS) <- c("age","sex","chest_pain","blood_pressure","cholesterol","sugar","cardio","heart_rate","exercise",  "oldpeak","slope","ca","thal","target")
+colnames(heartDS)
+
+# str(heartDS)
+# summary(heartDS)
+
+#View data
+datatable(heartDS)
+
+
+```
+
+**Clean up time**
+```{r message=FALSE, warning=FALSE}
+#Remove unwanted data
+ChoosenColumns <- c("age","sex","chest_pain","blood_pressure","cholesterol","sugar","cardio","heart_rate")
+heartDS_new <- heartDS[ChoosenColumns]
+
+#check out our new data
+datatable(heartDS_new)
+
+#data dimension
+dim(heartDS_new)
+
+#Create two new categories for sex.
+heartDS_new <- heartDS_new %>% mutate(M=if_else(sex==1, 1, 0))
+heartDS_new <- heartDS_new %>% mutate(F=if_else(sex==0, 1, 0))
+
+#categorize blood_pressure
+heartDS_new <- heartDS_new %>% mutate(blood_pressure_cat=if_else(blood_pressure>=120, "high", 
+                                                         if_else(blood_pressure<120, "Normal", "")))
+
+#what about chess_pain, binarize it!
+heartDS_new <- heartDS_new %>% mutate(has_chest_pain=if_else(chest_pain>2, 1, 0))
+
+
+heartDS_new <- gather(data=heartDS_new, key=sex_col, value=sex_count, M, F)
+datatable(heartDS_new)  
+```
+
+**eyeball the graph**
+```{r message=FALSE, warning=FALSE}
+
+#Examine data for the entire population,
+qplot(data=heartDS_new, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate")
+
+
+```
+
+**According to this plot, there is no clear relationship between Cholesterol and Heart rate. Points are everywhere (high or normal High Pressure), does not matter. No pattern is noticed.**
+
+
+**Consider the population above 60**
+```{r message=FALSE, warning=FALSE}
+
+heartDS_new_above_60 <- filter(heartDS_new, age > 60)
+
+#Male portion
+heartDS_new_above_60_M <- filter(heartDS_new_above_60, age > 60 & sex==1)
+
+#Female portion
+heartDS_new_above_60_F <- filter(heartDS_new_above_60, age > 60 & sex==0)
+
+#blood pressure to percent
+heartDS_new_above_60 <- mutate(heartDS_new_above_60, blood_pressure_per = (blood_pressure/100))
+
+#ceck it
+datatable(heartDS_new_above_60)
+
+#Plot it!!
+qplot(data=heartDS_new_above_60, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Above 60)")
+
+
+```
+
+**Consider the population below 60**
+```{r message=FALSE, warning=FALSE}
+
+heartDS_new_below_60 <- filter(heartDS_new, age < 60)
+
+#Male portion
+heartDS_new_below_60_M <- filter(heartDS_new_below_60, age < 60 & sex==1)
+
+#Female portion
+heartDS_new_below_60_F <- filter(heartDS_new_below_60, age < 60 & sex==0)
+
+#blood pressure to percent
+heartDS_new_below_60  <- mutate(heartDS_new_below_60, blood_pressure_per = (blood_pressure/100))
+
+#ceck it
+datatable(heartDS_new_below_60)
+
+#Plot it!!
+qplot(data=heartDS_new_below_60, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Below 60)")
+
+
+```
+
+**Plot the population groups**
+```{r message=FALSE, warning=FALSE}
+qplot(data=heartDS_new_above_60_M, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Male Above 60)")  
+```
+
+```{r message=FALSE, warning=FALSE}
+qplot(data=heartDS_new_above_60_F, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Female above 60)")  
+```
+
+```{r message=FALSE, warning=FALSE}
+qplot(data=heartDS_new_below_60_M, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Male Below 60)")  
+```
+
+```{r message=FALSE, warning=FALSE}
+qplot(data=heartDS_new_below_60_F, x=cholesterol, y=heart_rate, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Cholesterol vs Heart Rate (Female Below 60)")  
+```
+
+
+**What about age and cholesterol**
+
+```{r message=FALSE, warning=FALSE}
+#Age and cholesterol
+qplot(data=heartDS_new, x=cholesterol, y=age, size=I(3), color=blood_pressure_cat, alpha=I(0.6), main="Age vs Cholesterol (All)")
+```
+
+## Conclusion
+**from different the plots for the cholesterol vs Heart rate, there seems to be no relation between these 2 variables. But when ploting the Age against cholesterol, it is clear that the cholesterol is increasing when the age increases. therefore there is a strong positive correlation between the age and the Cholesterol level.**
+ 
+
+We can continue doing statistics, but will be doing the combinations in a randomness manner. but there is a statistical method that can do futures selection and select for us the best columns to choose that may lead into a fruitfull conclusion.Untol then let me show off some skills I picked up in statistics.
+```{r}
+#Look at the mean blood_pressure
+summarise(heartDS_new, mean(blood_pressure, na.rm=TRUE))
+
+#What about sex and blood_pressure
+summarise(group_by(heartDS_new, sex), mean(blood_pressure, na.rm=TRUE))
+
+#How about that random sample
+datatable(sample_n(heartDS_new, size=20))
+
+#what about 15% of the data
+datatable(sample_frac(heartDS_new, size=.15))
+
+#give me the count by sex
+count(heartDS_new, sex)
+
+#sorting the data
+datatable(arrange(heartDS_new, desc(age), sex))
+
+#and finally
+heartDS_new %>%
+  filter(sex==1) %>%
+  group_by(age) %>%
+  summary(mean(age, na.rm=TRUE))
+
+```
+
+
+
+
+
+
+
