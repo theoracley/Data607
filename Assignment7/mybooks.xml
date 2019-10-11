@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<books>
+   <book id="b1">
+     <title>AI for People and Business</title>
+      <authors>Alex Castrounis</authors>
+      <publisher>O'Reilly Media, Inc</publisher>        
+      <published_date>July 2019</published_date>
+      <isbn>9781492036579</isbn>
+   </book> 
+   <book id="b2">
+     <title>Own the A.I. Revolution</title>
+      <authors>Michael Ashley, Neil Sahota</authors>
+      <publisher>McGraw-Hill</publisher>        
+      <published_date>May 2019</published_date>
+      <isbn>9781260458381</isbn>
+   </book>
+   <book id="b3">
+     <title>Machine Learning and AI for Healthcare</title>
+      <authors>Arjun Panesar</authors>
+      <publisher>Apress</publisher>        
+      <published_date>February 2019</published_date>
+      <isbn>9781484237991</isbn>
+   </book> 
+</books>

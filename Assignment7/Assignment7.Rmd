@@ -1,0 +1,122 @@
+---
+title: "Assigment7 - Working with XML and JSON in R"
+author: "Abdelmalek Hajjam"
+date: "10/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+**Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more
+than one author. For each book, include the title, authors, and two or three other attributes that you find
+interesting.
+Take the information that you’ve selected about these three books, and separately create three files which
+store the book’s information in HTML (using an html table), XML, and JSON formats (e.g. “books.html”,
+“books.xml”, and “books.json”). To help you better understand the different file structures, I’d prefer that you
+create each of these files “by hand” unless you’re already very comfortable with the file formats.
+Write R code, using your packages of choice, to load the information from each of the three sources into
+separate R data frames. Are the three data frames identical?
+Your deliverable is the three source files and the R code. If you can, package your assignment solution up into
+an .Rmd file and publish to rpubs.com. [This will also require finding a way to make your three text files
+accessible from the web].**
+
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(stringr)
+library(XML) #for xml files processing
+library(RCurl)
+library(rvest)  # my favorite
+library(dplyr)
+library(jsonlite) # for json files processing
+library("kableExtra") # for beautify dataframes display
+
+
+# to get rid of the scientific notation for ISBN long number and leave it as character, we include the folling option:
+options(scipen=999) 
+#without this option on, the ISBN of our books will be presented in a scientific notation, i.e. with exponential display
+```
+
+
+## Loading from an HTML file that has an html table inside it
+```{r message=FALSE, warning=FALSE}
+url <- "https://raw.githubusercontent.com/theoracley/Data607/master/mybooks.html"
+
+#first method
+# theURL <- getURL(url)
+# myTable <- readHTMLTable(theURL, header=TRUE, which=1)
+# myTable
+
+
+# #second Method (more work)
+# page <- read_html(url)
+# tables <- html_nodes(page, "table")
+# myTable <- html_table(tables[1], fill = TRUE)
+# myTable[[1]]
+
+#third method
+myTable <- read_html(url)
+htmlBookDS <- myTable %>%
+  html_nodes("table") %>%
+  .[[1]] %>%
+  html_table(fill = NA) # html_table converts data to an R data frame automatically
+
+#htmlBookDS
+#beautify the display
+htmlBookDS  %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  scroll_box(width = "100%", height = "200px")
+ 
+```
+
+
+## Loading from an xml file
+```{r message=FALSE, warning=FALSE}
+
+url <- "https://raw.githubusercontent.com/theoracley/Data607/master/mybooks.xml"
+ 
+xmlData <- read_xml(url)
+aiBooks <- xml_children(xmlData)
+
+xmlBookDS <- c()
+for (i in 1:length(aiBooks)){
+  xmlBookDS <- rbind(xmlBookDS,xml_text(xml_children(aiBooks[i])))
+}
+
+xmlBookDS <- data.frame(xmlBookDS)
+
+colnames(xmlBookDS) <- xml_name(xml_children(aiBooks[1]))
+#xmlBookDS
+
+#beautify the display
+xmlBookDS  %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  scroll_box(width = "100%", height = "200px")
+
+```
+
+## Loading from a json file
+```{r message=FALSE, warning=FALSE}
+
+url <- "https://raw.githubusercontent.com/theoracley/Data607/master/mybooks.json"
+
+#fromJSON method converts any json object to an R data frame.
+jsonBookDS <- fromJSON(url)
+#jsonBookDS
+
+#beautify the display
+jsonBookDS  %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed")) %>%
+  scroll_box(width = "100%", height = "200px")
+
+
+```
+
+
+## Conclusion:
+**As we can see, all datasets created from html, xml and json files have exactly the same resulting dataframes. While all 3 files have different structures , they all yield the same resulting dataframes when choosing special package for each file type.**
