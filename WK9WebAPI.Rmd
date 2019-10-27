@@ -1,0 +1,50 @@
+---
+title: "WebAPI"
+author: "Abdelmalek Hajjam"
+date: "10/24/2019"
+output: html_document
+---
+
+**I created an API Key for the books from NYTimes. I will be looking for books in the health  category. I use PostMan to see how the output of the call to the web API will look like in a beautiful JSON format. This is what most developers out there use.**
+
+### loading libraries
+
+```{r message=FALSE, warning=FALSE}
+library(httr)
+library(dplyr)
+library(stringi)
+library(stringr)
+library(jsonlite)
+library(kableExtra)
+```
+
+
+### load the data (API Key is needed - we are loading books with respect to health) 
+
+```{r message=FALSE, warning=FALSE}
+
+booksApiKey <- "M69aWzqQECFYN9tTHAG0Gne8dzQK19KR"
+
+Url <- paste0("https://api.nytimes.com/svc/books/v3/lists/health.json?api-key=", booksApiKey) 
+
+health_books <- readLines(Url, warn = FALSE)
+
+
+#Read JSON data
+health_books <- fromJSON(health_books)  
+health_books_df <- health_books$results$books
+
+#display columns names
+colnames(health_books_df)
+
+#considering few columns to load
+health_books_df = health_books_df[c("title","author","publisher","primary_isbn10")] 
+
+#show the output
+#health_books_df
+kable(health_books_df) %>%
+   kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+
