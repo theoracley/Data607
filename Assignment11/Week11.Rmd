@@ -1,0 +1,57 @@
+---
+title: "Week11 - Recommender System"
+author: "Abdelmalek Hajjam"
+date: "11/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction - Flipboard
+
+Flipboard is a platform that aggregates news feeds, social media, photo sharing sites and similar sites and presents the media in a sleek magazine format. You can think of Flipboard as a smart magazine. Unlike traditional print magazines, Flipboard personalizes your content based on your interests, then displays relevant stories in a magazine-style layout that's both pleasing to the eye and easy to interact with. In addition to articles, you'll see other types of content including videos, podcasts, tweets, and more. It is the social news app people have been raving about for years. 
+
+
+# Design Analysis
+
+### Target users for Flipboard?
+
+Flipboard is aimed at users who want to read and share articles about specific subject matters; read what others are reading, example friends or those that they follow; want their social media feeds aggregated under one roof; may have a short attention span and want to dive in and out of varied content.
+As a reader it is a means to personalize the way you consume news and information. As a magazine maker you can use it for a variety of disciplines from research through presentations and much more.
+
+### key goals for Flipboard?
+
+Flipboard works by curating content from the web into visually beautiful and compelling magazines.
+With the limitless content out there, Flipboard wants to make the topics and mediums that the user is likely to consume and be interested in to be available on their main dash-board. The aim of Flipboard is to create a one-stop platform for the most popular content on the internet, example social media feeds and articles of interest.
+People can use Flipboard to create their own digital magazines to share with other users; as you read through the stories shown on Flipboard, you can easily add them to a new or existing magazine under your profile. Flipboard also lets you curate magazines based on a passion of yours, for specific sources, for sharing with a group or simply for creating a collection.
+
+
+### How does Flipboard accomplish this goal?
+
+When a user likes and article, follows a content or shares or consumes a magazine, the system take a notice and feeds these activities to the smart algorithms behind the scene whose job is the aggregation and display of tailored content to the users.
+
+
+# Reverse Enginner
+
+The interface of Flipboard and the way it presents media from multiple sources that the user can seamlessly flip through is what really makes the User interface fluent. The behind the scenes algorithms that present the tailor-made content could use things such as key-word pairing and cluster analysis based off of the text of articles that the user like or the types of articles that others with similar interests like.
+For instance, a training model would need to be made to mine keywords that appear in articles that the user gives a positive sentiment to. The mining process could find that. For example, articles that are read about data analysis sometimes include reference to things like R, Python or or data mining may give articles that contain such keywords greater weight. With the same token, content that has been tagged as R, Python or data mining may be recommended to the user. 
+
+
+# Flows with Flipboard
+
+Flipboard seems to deal with large media outlets and is limited to the publications that are willing to share their work, e.g., the New York Times has a limited agreement with them to only share certain content. Also, a lot of its sources seem to weigh heavily on what is trending on social media or other outlets. As a reader, I would want more focus paid to content over what major publications are printing or what is tending on Twitter. It is possible to minimize this by interacting with the app, following\\liking content from more obscure sources or not allowing Flipboard access to your social media.
+
+
+# References:
+
+https://www.whistleout.com/CellPhones/Guides/What-is-Flipboard
+
+https://archive.nytimes.com/www.nytimes.com/content/help/mobile/flipboard/flipboard-app.html?no_redirect=true
+
+https://www.verizonwireless.com/articles/what-is-flipboard-app-how-to-use/
+
+https://techcrunch.com/2017/10/10/flipboard-red-bolt/
+
+
