@@ -1,0 +1,178 @@
+---
+title: "Project 4 - Document Classification"
+author: "Abdelmalek Hajjam"
+date: "11/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
+
+For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder).   One example corpus:   https://spamassassin.apache.org/old/publiccorpus/ 
+
+In this project, we will be using dataset sms Collection from UCI Machine Learning Repository to create a Spam Classifier for SMS. This dataset includes the messages with a label indicating whether the message is unwanted, spam, or ham(legitimate messages)
+
+```{r }
+library(tm)
+library(SnowballC)
+library(RColorBrewer)
+library(wordcloud) #word clouds visualisation
+library(e1071) #naive bayes classifier
+library(gmodels) #provides CrossTable() function for comparison
+library(class)
+```
+
+```{r }
+
+# Loading data
+raw_text <- read.csv("https://raw.githubusercontent.com/theoracley/Data607/master/Project4/sms_spam_ham.csv", stringsAsFactors = FALSE)
+
+str(raw_text)
+```
+
+
+
+```{r }
+# Converting character vector to categorical vector
+raw_text$type <- factor(raw_text$type)
+str(raw_text$type) # verifying the conversion
+```
+
+```{r }
+table(raw_text$type)
+```
+
+```{r }
+# creating our corpus
+text_corpus <- VCorpus(VectorSource(raw_text$text))
+
+# get summary of the first 5 texts
+inspect(text_corpus[1:5]) # viewing first 5 texts
+```
+
+```{r }
+# Viewing the content of the first text
+as.character(text_corpus[[1]])
+```
+
+```{r }
+# Viewing the content of more than one texts using lapply() function
+lapply(text_corpus[1:5], as.character) 
+```
+
+### Cleaning our Corpus
+```{r }
+# Do the usual words clean up
+cleanCorpus <- tm_map(text_corpus, content_transformer(tolower)) # lowercase all texts
+cleanCorpus <- tm_map(cleanCorpus, removeNumbers) # remove all numbers
+cleanCorpus <- tm_map(cleanCorpus, removeWords, stopwords('english')) # remove all common words such as to, but and etc.
+cleanCorpus <- tm_map(cleanCorpus, removePunctuation) # remove all punctuation
+cleanCorpus <- tm_map(cleanCorpus, stripWhitespace) # remove all whitespace
+
+
+text_dtm <- DocumentTermMatrix(cleanCorpus)
+inspect(text_dtm)
+
+```
+
+```{r }
+# Creating train and test portions 
+train <- text_dtm[1:4169, ] # 75% for training
+test <- text_dtm[4170:5559, ] # 25% for testing
+train_type <- raw_text[1:4169, ]$type
+test_type <- raw_text[4170:5559, ]$type
+```
+
+##### Verifying both portions are equally distributed
+```{r }
+#training portion
+tbl_train <- prop.table(table(train_type))
+tbl_train
+
+```
+
+```{r }
+#testing portion
+tbl_test <- prop.table(table(test_type))
+tbl_test
+
+```
+
+#### Build the spam cloud
+```{r }
+
+# Visualizing text by spam type
+spamText <- subset(raw_text, type == "spam") 
+wordcloud(spamText$text, max.words = 50, scale = c(5, 0.3),random.order = FALSE, rot.per = 0.15, colors = brewer.pal(8, "Dark2") )
+```
+
+#### Build the ham cloud
+```{r }
+hamText <- subset(raw_text, type =="ham") # selecting ham texts
+wordcloud(hamText$text, max.words = 50, scale = c(5, 0.3),random.order = FALSE, rot.per = 0.15, colors = brewer.pal(8, "Dark2"))
+```
+
+```{r }
+# eliminating any word that appear in less than 5 texts
+freq_words <- findFreqTerms(train, 5) 
+str(freq_words)
+```
+
+#### Converting numerical vectors of the DTM to categorical vector for the model
+```{r }
+# Selecting only the frequent words from the train and test datasets
+freq_words_train <- train[ , freq_words]
+freq_words_test <- test[ , freq_words]
+
+
+# creating a function for conversion
+convert <- function(x) {x <- ifelse(x > 0, "y", "n")} 
+train <- apply(freq_words_train, MARGIN = 2, convert)
+test <- apply(freq_words_test, MARGIN = 2, convert)
+str(train) # verifying the conversion
+```
+
+#### Training our Model
+```{r }
+# Creating a Naive Bayes classifier
+sms_classifier <- naiveBayes(train, train_type)
+
+# Making prediction & evaluation with the classifier
+test_prediction <- predict(sms_classifier, test)
+
+CrossTable(test_prediction, test_type, 
+           prop.chisq = FALSE, prop.t = FALSE,
+           dnn = c('predicted', 'actual'))
+
+```
+
+**This Classifier gives us 97% accuracy, with only 36 (30 + 6) mislabeled messages from the total.**
+
+**Let's tweak one of the parameters of the NaiveBayes classifier, that is laplace parameter, and see what's going to happen. So let's improve the model!!**
+
+```{r }
+#laplace assures that one word is not mislabled just because it appeared once on ham/spam texts
+sms_classifier_improved <- naiveBayes(train, train_type, laplace = 1)
+test_prediction_improved <- predict(sms_classifier_improved, test)
+
+CrossTable(test_prediction_improved, test_type, 
+           prop.chisq = FALSE, prop.t = FALSE,
+           dnn = c('predicted', 'actual'))
+```
+
+**As we can see, only 34 messages are now mislabeled.**
+
+
+
+
+
+
+
+
+
+
+
+
